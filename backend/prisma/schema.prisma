@@ -13,8 +13,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model Category {
+  id         Int      @id @default(autoincrement())
+  name       String  
+  picture    String?
+  parent_id  Int?     
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  parent   Category?  @relation("CategoryParent", fields: [parent_id], references: [id])
+  children Category[] @relation("CategoryParent")
+  products Product[]
 }
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  picture     String? 
+  category_id Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  category Category @relation(fields: [category_id], references: [id])
+}
+
+
