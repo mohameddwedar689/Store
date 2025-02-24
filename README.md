@@ -66,8 +66,5 @@ npm install
 - **PUT** `/api/products/:productId` – Update an existing product by ID.
 - **DELETE** `/api/products/:productId` – Delete a product by ID.
 
-### Image Upload
-- **POST** `/api/upload` – Upload and resize an image to 3200x3200 pixels.
-
 This structure keeps it clean and easy to read. Let me know if you want to add anything! 🚀
 
