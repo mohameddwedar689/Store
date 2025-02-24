@@ -20,8 +20,8 @@ model Category {
     parent_id  Int?
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
-    parent   Category?  @relation("CategoryToCategory", fields: [parent_id], references: [id])
-    children Category[] @relation("CategoryToCategory")
+    parent   Category?  @relation("CategoryParent", fields: [parent_id], references: [id])
+    children Category[] @relation("CategoryChildren", references: [id])
     products Product[]
 }
 

@@ -20,25 +20,25 @@ export default defineEventHandler(async (event: H3Event) => {
   try {
     // Fetch all categories with their children
     const categories = await prisma.category.findMany({
+      where: { parent_id: null }, // Start from top-level categories
+  include: {
+    children: {
       include: {
+        children: { include: { children: true } }, // Recursively fetch children
         products: true, // Include products for each category
       },
+    },
+    products: true, // Include products for each category
+  },
     });
 
-    const countProductsRecursively = (
-      category: Category,
-      allCategories: Category[]
-    ): number => {
+    const countProductsRecursively = (category: Category): number => {
       let count = category.products ? category.products.length : 0;
-
-      // Find children categories and count their products
-      const children = allCategories.filter(
-        (cat) => cat.parent_id === category.id
-      );
-      for (const child of children) {
-        count += countProductsRecursively(child, allCategories);
+      
+      for (const child of category.children || []) {
+        count += countProductsRecursively(child);
       }
-
+    
       return count;
     };
 
@@ -46,17 +46,11 @@ export default defineEventHandler(async (event: H3Event) => {
       categories: Category[],
       parentId: number | null = null
     ): Category[] => {
-      return categories
-        .filter((cat) => cat.parent_id === parentId) // Find direct children
-        .map((cat) => {
-          const children = buildTree(categories, cat.id); // Recursively find children
-
-          return {
-            ...cat,
-            children, // Attach the correct children
-            totalProductCount: countProductsRecursively(cat, categories), // Ensure product counting is correct
-          };
-        });
+      return categories.map((cat) => ({
+        ...cat,
+        totalProductCount: countProductsRecursively(cat),
+        children: buildTree(cat.children || []), // ✅ Use Prisma’s fetched children
+      }));
     };
     return { success: true, data: buildTree(categories) };
   } catch (error) {

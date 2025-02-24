@@ -15,6 +15,7 @@ const newCategory = ref({ name: "", picture: "", parent_id: null });
 const showModal = ref(false);
 const isEditing = ref(false);
 const allCategories = ref([]);
+const expandedCategories = ref(new Set());
 
 const router = useRouter();
 
@@ -22,24 +23,38 @@ const navigateToTree = () => {
   router.push("/categories-tree"); // Change this to the actual route
 };
 
+const flattenCategories = (categories) => {
+  let flatList = [];
+  for (const category of categories) {
+    flatList.push(category);
+    if (category.children && category.children.length > 0) {
+      flatList = flatList.concat(flattenCategories(category.children));
+    }
+  }
+  return flatList;
+};
+
 const fetchCategoryTree = async () => {
   const response = await $fetch("/api/categories/tree");
   categoryTree.value = response.data;
-  parentCategories.value = [{ id: null, name: "None" }, ...response.data];
+  parentCategories.value = [{ id: null, name: "None" }, ...flattenCategories(response.data)];
 };
 
 const fetchCategories = async () => {
   const response = await $fetch("/api/categories/tree");
-  allCategories.value = response.data.flatMap((category) => [
-    category,
-    ...category.children,
-  ]);
+  allCategories.value = flattenCategories(response.data);
 };
 
 // Toggle category visibility
 const toggleCategory = (category) => {
-  category.expanded = !category.expanded;
+  if (expandedCategories.value.has(category.id)) {
+    expandedCategories.value.delete(category.id);
+  } else {
+    expandedCategories.value.add(category.id);
+  }
 };
+
+const isExpanded = (category) => expandedCategories.value.has(category.id);
 
 // Fetch a single category by ID
 const fetchCategoryById = async (id) => {
@@ -69,7 +84,7 @@ const saveCategory = async () => {
     }
     showModal.value = false;
     fetchCategoryTree(); // Refresh list
-    fetchCategories();
+    //fetchCategories();
   } catch (error) {
     console.error("Error saving category:", error);
   }
@@ -116,8 +131,10 @@ const deleteCategory = async (id) => {
 
   try {
     await $fetch(`/api/categories/${id}`, { method: "DELETE" });
-    fetchCategoryTree(); // Refresh list
-    fetchCategories();
+
+    // Remove from local state instantly
+    allCategories.value = allCategories.value.filter((cat) => cat.id !== id);
+    categoryTree.value = categoryTree.value.filter((cat) => cat.id !== id);
   } catch (error) {
     console.error("Error deleting category:", error);
   }
