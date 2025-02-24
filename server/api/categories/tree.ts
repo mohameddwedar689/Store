@@ -18,17 +18,16 @@ interface Category {
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    // Fetch all categories with their children
     const categories = await prisma.category.findMany({
-      where: { parent_id: null }, // Start from top-level categories
+      where: { parent_id: null }, 
   include: {
     children: {
       include: {
-        children: { include: { children: true } }, // Recursively fetch children
-        products: true, // Include products for each category
+        children: { include: { children: true } }, 
+        products: true, 
       },
     },
-    products: true, // Include products for each category
+    products: true, 
   },
     });
 
@@ -49,7 +48,7 @@ export default defineEventHandler(async (event: H3Event) => {
       return categories.map((cat) => ({
         ...cat,
         totalProductCount: countProductsRecursively(cat),
-        children: buildTree(cat.children || []), // ✅ Use Prisma’s fetched children
+        children: buildTree(cat.children || []), 
       }));
     };
     return { success: true, data: buildTree(categories) };

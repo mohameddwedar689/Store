@@ -23,8 +23,16 @@ export default defineEventHandler(async (event: H3Event) => {
       const body = await readBody(event);
       const { name, picture, parent_id } = body;
 
+      if (!name || typeof name !== "string") {
+        return sendError(event, createError({ statusCode: 400, statusMessage: "Category name is required and must be a string" }));
+      }
+
       const newCategory = await prisma.category.create({
-        data: { name, picture, parent_id },
+        data: {
+          name,
+          picture: picture || "",
+          parent_id
+        },
       });
       return newCategory;
     }

@@ -20,7 +20,7 @@ const expandedCategories = ref(new Set());
 const router = useRouter();
 
 const navigateToTree = () => {
-  router.push("/categories-tree"); // Change this to the actual route
+  router.push("/categories-tree"); 
 };
 
 const flattenCategories = (categories) => {
@@ -54,7 +54,7 @@ const toggleCategory = (category) => {
   }
 };
 
-const isExpanded = (category) => expandedCategories.value.has(category.id);
+
 
 // Fetch a single category by ID
 const fetchCategoryById = async (id) => {
@@ -69,26 +69,32 @@ const fetchCategoryById = async (id) => {
 // Save category (either add or update)
 const saveCategory = async () => {
   try {
+    const categoryData = {
+      name: newCategory.value.name?.trim() || "", // Ensure it's not empty
+      picture: newCategory.value.picture || "",
+      parent_id: newCategory.value.parent_id || null,
+    };
+
     if (isEditing.value) {
-      // Update existing category
       await $fetch(`/api/categories/${selectedCategory.value.id}`, {
         method: "PUT",
-        body: newCategory.value,
+        body: categoryData,
       });
     } else {
-      // Create new category
       await $fetch(`/api/categories`, {
         method: "POST",
-        body: newCategory.value,
+        body: categoryData,
       });
     }
+
     showModal.value = false;
     fetchCategoryTree(); // Refresh list
-    //fetchCategories();
+    fetchCategories();
   } catch (error) {
     console.error("Error saving category:", error);
   }
 };
+
 
 // Open modal for adding a new category
 const addNewCategory = () => {
@@ -142,20 +148,29 @@ const deleteCategory = async (id) => {
 
 const uploadImage = async (event) => {
   const file = event.target.files[0];
-  if (!file) return;
+  if (!file) return console.error("No file selected");
 
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await $fetch("/api/categories/upload", {
-    method: "POST",
-    body: formData,
-  });
+  try {
+    const response = await $fetch("/api/categories/upload", {
+      method: "POST",
+      body: formData,
+    });
 
-  if (response.success) {
-    newCategory.picture = response.filePath;
+
+    if (response.success && response.filePath) {
+  newCategory.value.picture = response.filePath; 
+} else {
+  console.error("Upload failed:", response.message);
+}
+  } catch (error) {
+    console.error("Error uploading image:", error);
   }
 };
+
+
 
 onMounted(() => {
   fetchCategoryTree();
@@ -222,13 +237,10 @@ onMounted(() => {
             v-model="newCategory.name"
             label="Category Name"
           ></v-text-field>
-          <v-text-field
-            v-model="newCategory.picture"
-            label="Picture URL"
-          ></v-text-field>
+          
 
           <v-file-input
-            label="Category Image"
+            label="Picture URL"
             @change="uploadImage"
             class="w-100"
             prepend-icon=""

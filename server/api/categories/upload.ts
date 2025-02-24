@@ -23,19 +23,16 @@ export default defineEventHandler(async (event) => {
     return { success: false, message: "Invalid file type" };
   }
 
-  // Generate unique filename
   const uniqueFilename = `${Date.now()}-${file.filename}`;
   const filePath = join("public/uploads", uniqueFilename);
 
-  // Save the file
   const writeStream = createWriteStream(filePath);
   writeStream.write(file.data);
 
-  // Return the full accessible URL
   const fileUrl = `/uploads/${uniqueFilename}`;
 
   return {
     success: true,
-    fileUrl,
+    filePath: fileUrl,
   };
 });

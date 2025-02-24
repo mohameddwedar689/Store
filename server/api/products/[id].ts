@@ -4,8 +4,8 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, "id"); // Get the product ID from URL
-  const body = await readBody(event); // Read request body
+  const id = getRouterParam(event, "id"); 
+  const body = await readBody(event);
 
   if (!id) {
     throw createError({ statusCode: 400, message: "Product ID is required" });

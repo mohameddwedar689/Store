@@ -30,7 +30,6 @@ const editProduct = (product) => {
 const saveProduct = async () => {
   try {
     if (isEditing.value) {
-      // Now we pass the ID in the URL
       await $fetch(`/api/products/${newProduct.value.id}`, {
         method: "PUT",
         body: newProduct.value,
@@ -42,7 +41,7 @@ const saveProduct = async () => {
       });
     }
 
-    await fetchProducts(); // Refresh product list
+    await fetchProducts();
     showModal.value = false;
   } catch (error) {
     console.error("Error saving product:", error);
@@ -68,6 +67,29 @@ const categoryTree = computed(() => {
     };
   });
 });
+
+const uploadImage = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return console.error("No file selected");
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await $fetch("/api/categories/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.success && response.filePath) {
+  newProduct.value.picture = response.filePath;
+} else {
+  console.error("Upload failed:", response.message);
+}
+  } catch (error) {
+    console.error("Error uploading image:", error);
+  }
+};
 
 onMounted(() => {
   fetchProducts();
@@ -132,10 +154,12 @@ onMounted(() => {
             v-model="newProduct.name"
             label="Product Name"
           ></v-text-field>
-          <v-text-field
-            v-model="newProduct.picture"
+          <v-file-input
             label="Picture URL"
-          ></v-text-field>
+            @change="uploadImage"
+            class="w-100"
+            prepend-icon=""
+          />
           <v-select
             v-model="newProduct.category_id"
             :items="categories"
@@ -157,8 +181,8 @@ onMounted(() => {
 
 <style>
 .custom-select {
-  width: 100%; /* Make it full width */
-  max-width: 400px; /* Set a max width */
-  margin-bottom: 16px; /* Add spacing below */
+  width: 100%;
+  max-width: 400px; 
+  margin-bottom: 16px; 
 }
 </style>

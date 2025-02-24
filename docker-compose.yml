@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  # Nuxt 3 App
+  
   nuxt-app:
     build: .
     container_name: nuxt_app
@@ -15,7 +15,7 @@ services:
       - .:/app
       - /app/node_modules
 
-  # MySQL Database
+  
   db:
     image: mysql:8.0
     container_name: mysql_db
