@@ -101,7 +101,11 @@ const saveCategory = async () => {
     fetchCategoryTree(); // Refresh list
     fetchCategories();
   } catch (error) {
-    console.error("Error saving category:", error);
+    if (error.data?.data) {
+      alert("Validation Error: " + error.data.data.join("\n")); // Show validation errors
+    } else {
+      console.error("Error saving category:", error);
+    }
   }
 };
 

@@ -6,6 +6,7 @@ import {
   sendError,
   createError,
 } from "h3";
+import {validateGetCategory , validateDeleteCategory , validateUpdateCategory} from '../../validation/categorySchema'
 
 const prisma = new PrismaClient();
 
@@ -22,6 +23,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     if (method === "GET") {
+      await validateGetCategory(event)
       const category = await prisma.category.findUnique({
         where: { id: Number(id) },
         include: { products: true },
@@ -31,6 +33,7 @@ export default defineEventHandler(async (event) => {
     }
 
     if (method === "PUT") {
+      await validateUpdateCategory(event)
       const body = await readBody(event);
       const updatedCategory = await prisma.category.update({
         where: { id: Number(id) },
@@ -40,6 +43,7 @@ export default defineEventHandler(async (event) => {
     }
 
     if (method === "DELETE") {
+      await validateDeleteCategory(event)
       await prisma.category.delete({
         where: { id: Number(id) },
       });

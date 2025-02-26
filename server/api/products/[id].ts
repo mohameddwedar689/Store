@@ -1,5 +1,7 @@
 import { defineEventHandler, getRouterParam, readBody, createError } from "h3";
 import { PrismaClient } from "@prisma/client";
+import { validateUpdateProduct } from "../../validation/productSchema";
+
 
 const prisma = new PrismaClient();
 
@@ -12,6 +14,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (event.method === "PUT") {
+    await validateUpdateProduct(event)
     try {
       const updatedProduct = await prisma.product.update({
         where: { id: Number(id) },
