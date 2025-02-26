@@ -16,12 +16,20 @@ const showModal = ref(false);
 const isEditing = ref(false);
 const allCategories = ref([]);
 const expandedCategories = ref(new Set());
+const hasSubmitted = ref(false)
 
 const router = useRouter();
 
 const navigateToTree = () => {
   router.push("/categories-tree"); 
 };
+
+// validation
+const validateForm = () => {
+  if (!hasSubmitted.value) return true;
+  return newCategory.value.name.trim() !== "" && newCategory.value.picture !== "";
+};
+
 
 const flattenCategories = (categories) => {
   let flatList = [];
@@ -68,6 +76,8 @@ const fetchCategoryById = async (id) => {
 // Add new category
 // Save category (either add or update)
 const saveCategory = async () => {
+  hasSubmitted.value = true;
+  if (!validateForm()) return;
   try {
     const categoryData = {
       name: newCategory.value.name?.trim() || "", // Ensure it's not empty
@@ -101,6 +111,7 @@ const addNewCategory = () => {
   newCategory.value = { name: "", picture: "", parent_id: null };
   isEditing.value = false;
   showModal.value = true;
+  hasSubmitted.value = false;
 };
 
 // Update a category
@@ -236,6 +247,7 @@ onMounted(() => {
           <v-text-field
             v-model="newCategory.name"
             label="Category Name"
+            :error="hasSubmitted && !newCategory.name.trim()"
           ></v-text-field>
           
 
@@ -244,6 +256,7 @@ onMounted(() => {
             @change="uploadImage"
             class="w-100"
             prepend-icon=""
+            :error="hasSubmitted && !newCategory.picture"
           />
 
           <v-select
@@ -253,6 +266,11 @@ onMounted(() => {
             item-value="id"
             label="Parent Category"
           ></v-select>
+
+          <p v-if="hasSubmitted && !newCategory.name" class="text-danger">Please add the category name before submitting.</p>
+          <p v-if="hasSubmitted && !newCategory.picture" class="text-danger">Please upload the image before submitting.</p>
+
+
         </v-card-text>
         <v-card-actions>
           <v-btn color="blue" @click="showModal = false">Cancel</v-btn>
