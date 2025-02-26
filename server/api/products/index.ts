@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
       const newProduct = await prisma.product.create({ data: body });
       return newProduct;
     } else if (method === "DELETE") {
-      await validateDeleteProduct(event)
+      //await validateDeleteProduct(event)
       const body = await readBody(event);
       if (!body.id)
         throw createError({

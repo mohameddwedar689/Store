@@ -33,7 +33,7 @@ export const validateGetCategory = async (event: H3Event) => {
 export const validateDeleteCategory = async (event: H3Event) => {
     const params = getRouterParams(event);
     const schema = yup.object({
-        id: yup.number().required("Category ID is required").positive().integer(),
+        id: yup.number().positive().integer().nullable(),
     });
     return schema.validate(params, { abortEarly: false });
 };

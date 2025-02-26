@@ -17,7 +17,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
   try {
     if (method === "GET") {
-      //await validateGetCategory(event)
+      await validateGetCategory(event)
       return await prisma.category.findMany({
         include: { children: true, products: true },
       });

@@ -185,6 +185,11 @@ const uploadImage = async (event) => {
   }
 };
 
+const getCategoryImage = (imagePath) => {
+  if (!imagePath) return "public/upload/default-category.png";
+  return `${imagePath}`; 
+};
+
 
 
 onMounted(() => {
@@ -217,12 +222,22 @@ onMounted(() => {
         :key="category.id"
         class="list-group-item d-flex justify-content-between align-items-center"
       >
-        <strong
-          >{{ category.name }} ({{
-            category.totalProductCount
-          }}
-          Products)</strong
-        >
+        <div class="d-flex align-items-center gap-3">
+      <!-- Category Image -->
+      <img
+        :src="getCategoryImage(category.picture)"
+        alt="Category Image"
+        class="rounded-circle"
+        width="50"
+        height="50"
+      />
+
+      <!-- Category Details -->
+      <div>
+        <strong>{{ category.name }}</strong>
+        <p class="text-muted mb-0">({{ category.totalProductCount }} Products)</p>
+      </div>
+    </div>
 
         <div>
           <button

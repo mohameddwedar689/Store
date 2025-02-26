@@ -18,7 +18,7 @@ model Category {
   name      String
   picture   String?
   parent_id Int?
-  parent    Category? @relation("CategoryToSelf", fields: [parent_id], references: [id])
+  parent    Category? @relation("CategoryToSelf", fields: [parent_id], references: [id] , onDelete: Cascade)
   children  Category[] @relation("CategoryToSelf")
 
   products  Product[] // Add this to define the reverse relation from Product to Category
@@ -35,6 +35,6 @@ model Product {
     created_at  DateTime @default(now())
     updated_at  DateTime @updatedAt
 
-    category Category @relation(fields: [category_id], references: [id])
+    category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
 }
 

@@ -25,7 +25,7 @@ export const validateUpdateProduct = async (event: H3Event) => {
 export const validateGetProduct = async (event: H3Event) => {
     const params = getRouterParams(event);
     const schema = yup.object({
-        id: yup.number().required("Product ID is required").positive().integer(),
+        id: yup.number().positive().integer().nullable(),
     });
     return schema.validate(params, { abortEarly: false });
 };
@@ -33,7 +33,7 @@ export const validateGetProduct = async (event: H3Event) => {
 export const validateDeleteProduct = async (event: H3Event) => {
     const params = getRouterParams(event);
     const schema = yup.object({
-        id: yup.number().required("Product ID is required").positive().integer(),
+        id: yup.number().positive().integer().nullable(),
     });
     return schema.validate(params, { abortEarly: false });
 };

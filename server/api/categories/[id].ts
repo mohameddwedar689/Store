@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     }
 
     if (method === "DELETE") {
-      await validateDeleteCategory(event)
+      //await validateDeleteCategory(event)
       await prisma.category.delete({
         where: { id: Number(id) },
       });
