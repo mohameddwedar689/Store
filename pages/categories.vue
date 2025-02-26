@@ -17,6 +17,7 @@ const isEditing = ref(false);
 const allCategories = ref([]);
 const expandedCategories = ref(new Set());
 const hasSubmitted = ref(false)
+const dialog = ref(false);
 
 const router = useRouter();
 
@@ -227,10 +228,17 @@ onMounted(() => {
       <img
         :src="getCategoryImage(category.picture)"
         alt="Category Image"
-        class="rounded-circle"
+        class="rounded-circle clickable-image"
         width="50"
         height="50"
+        @click="dialog = true"
       />
+
+      <v-dialog v-model="dialog" max-width="90%">
+        <v-card>
+          <v-img :src="getCategoryImage(category.picture)" alt="Category Image" max-height="3200" max-width="3200" />
+        </v-card>
+      </v-dialog>
 
       <!-- Category Details -->
       <div>
@@ -299,3 +307,10 @@ onMounted(() => {
     </v-dialog>
   </div>
 </template>
+
+<style>
+.clickable-image {
+  cursor: pointer;
+}
+</style>
+

@@ -7,6 +7,7 @@ const showModal = ref(false);
 const isEditing = ref(false);
 const newProduct = ref({ name: "", picture: "", category_id: null });
 const hasSubmitted = ref(false)
+const dialog = ref(false);
 
 const validateForm = () => {
   if (!hasSubmitted.value) return true;
@@ -142,10 +143,17 @@ onMounted(() => {
       <img
         :src="getCategoryImage(product.picture)"
         alt="Category Image"
-        class="rounded-circle"
+        class="rounded-circle clickable-image"
         width="50"
         height="50"
+        @click="dialog = true"
       />
+
+      <v-dialog v-model="dialog" max-width="90%">
+        <v-card>
+          <v-img :src="getCategoryImage(product.picture)" alt="Product Image" max-height="3200" max-width="3200" />
+        </v-card>
+      </v-dialog>
 
       <!-- Product Details -->
       <div>
@@ -220,4 +228,9 @@ onMounted(() => {
   max-width: 400px; 
   margin-bottom: 16px; 
 }
+
+.clickable-image {
+  cursor: pointer;
+}
+
 </style>
