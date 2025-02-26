@@ -6,6 +6,12 @@ const categories = ref([]);
 const showModal = ref(false);
 const isEditing = ref(false);
 const newProduct = ref({ name: "", picture: "", category_id: null });
+const hasSubmitted = ref(false)
+
+const validateForm = () => {
+  if (!hasSubmitted.value) return true;
+  return newProduct.value.name.trim() !== "" && newProduct.value.picture !== "";
+};
 
 const fetchProducts = async () => {
   products.value = await $fetch("/api/products");
@@ -19,6 +25,7 @@ const addNewProduct = () => {
   newProduct.value = { name: "", picture: "", category_id: null };
   isEditing.value = false;
   showModal.value = true;
+  hasSubmitted.value = false;
 };
 
 const editProduct = (product) => {
@@ -28,6 +35,8 @@ const editProduct = (product) => {
 };
 
 const saveProduct = async () => {
+  hasSubmitted.value = true;
+  if (!validateForm()) return;
   try {
     if (isEditing.value) {
       await $fetch(`/api/products/${newProduct.value.id}`, {
@@ -153,12 +162,14 @@ onMounted(() => {
           <v-text-field
             v-model="newProduct.name"
             label="Product Name"
+            :error="hasSubmitted && !newProduct.name.trim()"
           ></v-text-field>
           <v-file-input
             label="Picture URL"
             @change="uploadImage"
             class="w-100"
             prepend-icon=""
+            :error="hasSubmitted && !newProduct.picture"
           />
           <v-select
             v-model="newProduct.category_id"
@@ -169,6 +180,10 @@ onMounted(() => {
             variant="outlined"
             class="custom-select"
           ></v-select>
+
+          <p v-if="hasSubmitted && !newProduct.name" class="text-danger">Please add the category name before submitting.</p>
+          <p v-if="hasSubmitted && !newProduct.picture" class="text-danger">Please upload the image before submitting.</p>
+
         </v-card-text>
         <v-card-actions>
           <v-btn color="blue" @click="showModal = false">Cancel</v-btn>
